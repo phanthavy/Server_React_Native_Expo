@@ -40,10 +40,16 @@ async function postProducts(req: e.Request, res: e.Response) {
       },
     });
 
-    if(checkedName) return res.status(500).json({message: 'This name already exists!'})
+    if (checkedName)
+      return res.status(409).json({ message: "This name already exists!" });
 
     const product = await prisma.product.create({
-      data: req.body,
+      data: {
+        product_name,
+        product_description,
+        product_price: Number(product_price),
+        product_image: req.file ? `/uploads/${req.file.filename}` : null,
+      },
     });
 
     successTools.handleSuccess(

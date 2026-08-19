@@ -32,6 +32,8 @@ app.use(
 app.use(morgan("dev"));
 app.use(express.json({ limit: "1mb" }));
 
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
 const routePath = path.join(__dirname, "routes");
 readdirSync(routePath).forEach((file: any) => {
   app.use("/api", require(`./routes/${file}`));
