@@ -19,7 +19,7 @@ model Product {
   product_name        String   @unique
   product_description String
   product_price       Int
-  product_image       String?
+  product_image       Json?
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
 }

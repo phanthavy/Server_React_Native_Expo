@@ -10,7 +10,11 @@ async function getProducts(req: e.Request, res: e.Response) {
 
   try {
     const [products, total] = await prisma.$transaction([
-      prisma.product.findMany({ skip, take: pageSize }),
+      prisma.product.findMany({
+        skip,
+        take: pageSize,
+        orderBy: { createdAt: "desc" },
+      }),
       prisma.product.count(),
     ]);
 
@@ -29,10 +33,13 @@ async function getProducts(req: e.Request, res: e.Response) {
 }
 
 async function postProducts(req: e.Request, res: e.Response) {
-  const { product_name, product_description, product_price } = req.body;
+  const { product_name, product_description, product_price, product_image } =
+    req.body;
 
   try {
-    if (!product_name || !product_description || !product_price) return;
+    if (!product_name || !product_description || !product_price) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
 
     const checkedName = await prisma.product.findUnique({
       where: {
@@ -43,12 +50,14 @@ async function postProducts(req: e.Request, res: e.Response) {
     if (checkedName)
       return res.status(409).json({ message: "This name already exists!" });
 
+    const images = Array.isArray(product_image) ? product_image : [];
+
     const product = await prisma.product.create({
       data: {
         product_name,
         product_description,
-        product_price: Number(product_price),
-        product_image: req.file ? `/uploads/${req.file.filename}` : null,
+        product_price: Number(String(product_price).replaceAll(",", "")),
+        product_image: images,
       },
     });
 
