@@ -33,13 +33,18 @@ async function getProducts(req: e.Request, res: e.Response) {
 }
 
 async function postProducts(req: e.Request, res: e.Response) {
-  const { product_name, product_description, product_price, product_image } =
-    req.body;
+  const {
+    product_name,
+    product_description,
+    product_price,
+    product_image,
+    category_id,
+  } = req.body;
 
   try {
-    if (!product_name || !product_description || !product_price) {
-      return res.status(400).json({ message: "All fields are required" });
-    }
+    // if (!product_name || !product_description || !product_price) {
+    //   return res.status(400).json({ message: "All fields are required" });
+    // }
 
     const checkedName = await prisma.product.findUnique({
       where: {
@@ -58,6 +63,7 @@ async function postProducts(req: e.Request, res: e.Response) {
         product_description,
         product_price: Number(String(product_price).replaceAll(",", "")),
         product_image: images,
+        category_id: Number(category_id) || null,
       },
     });
 

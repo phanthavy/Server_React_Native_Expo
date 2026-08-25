@@ -14,12 +14,148 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// product 1
 model Product {
-  product_id          Int      @id @default(autoincrement())
-  product_name        String   @unique
+  product_id          Int       @id @default(autoincrement())
+  product_name        String    @unique
   product_description String
   product_price       Int
   product_image       Json?
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  category            Category? @relation(fields: [category_id], references: [cat_id])
+  category_id         Int?
+
+  cartItems   CartItem[]
+  OrderItems OrderItem[]
+}
+
+// category 2
+model Category {
+  cat_id   Int    @id @default(autoincrement())
+  cat_name String @unique
+
+  products Product[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// user 3
+model User {
+  user_id       Int      @id @default(autoincrement())
+  user_name     String
+  user_email    String   @unique
+  user_password String
+  user_role     UserRole @default(CUSTOMER)
+
+  carts   Cart[]
+  orders  Order[]
+  address Address[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// role 4
+enum UserRole {
+  CUSTOMER
+  ADMIN
+}
+
+// cart 5
+model Cart {
+  cart_id Int @id @default(autoincrement())
+
+  user    User? @relation(fields: [user_id], references: [user_id])
+  user_id Int?
+
+  cartItems CartItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// cartItem 6
+model CartItem {
+  cartItem_id Int @id @default(autoincrement())
+
+  quantity Int @default(1)
+
+  cart    Cart? @relation(fields: [cart_id], references: [cart_id])
+  cart_id Int?
+
+  product    Product? @relation(fields: [product_id], references: [product_id])
+  product_id Int?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// OrderStatus 7
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+// order 8
+model Order {
+  order_id Int @id @default(autoincrement())
+
+  orderNumber String @unique
+
+  status OrderStatus @default(PENDING)
+
+  totalAmount Decimal @db.Decimal(12, 2)
+
+  OrderItems OrderItem[]
+
+  user    User? @relation(fields: [user_id], references: [user_id])
+  user_id Int?
+
+  address           Address? @relation(fields: [address_id], references: [address_id])
+  address_id Int?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// OrderItem 9
+model OrderItem {
+  orderItem_id Int @id @default(autoincrement())
+
+  quantity Int
+  price    Decimal @db.Decimal(12, 2)
+
+  order         Order? @relation(fields: [order_id], references: [order_id])
+  order_id Int?
+
+  createdAt DateTime @default(now())
+
+  product    Product? @relation(fields: [product_id], references: [product_id])
+  product_id Int?
+}
+
+//address 10
+model Address {
+  address_id   Int     @id @default(autoincrement())
+  address_name String?
+  phone        String?
+  address      String?
+  city         String?
+  province     String?
+  postalCode   String?
+
+  orders Order[]
+
+  user        User? @relation(fields: [user_id], references: [user_id])
+  user_id Int?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

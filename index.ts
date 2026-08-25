@@ -9,8 +9,7 @@ require("dotenv").config();
 const app = express();
 const PORT = process.env.SERVER_PORT;
 
-const allowedOrigins =
-  process.env.ALLOWED_ORIGINS?.split(",").map((o) => o.trim()) ?? [];
+const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(",").map((o) => o.trim()) ?? [];
 
 app.disable("x-powered-by");
 
@@ -27,6 +26,7 @@ app.use(
         callback(new Error("Not Allowed By CORS"));
       }
     },
+    Credential: true
   }),
 );
 app.use(morgan("dev"));
