@@ -13,7 +13,16 @@ async function getProducts(req: e.Request, res: e.Response) {
       prisma.product.findMany({
         skip,
         take: pageSize,
-        orderBy: { createdAt: "desc" },
+        orderBy: { product_id: "desc" },
+        select: {
+          product_id: true,
+          product_name: true,
+          product_description: true,
+          product_price: true,
+          product_image: true,
+          category_id: true,
+          // omit product_image for list, or keep if you must show thumbs
+        },
       }),
       prisma.product.count(),
     ]);
